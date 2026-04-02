@@ -6,82 +6,73 @@ public class TrainConsistManagementApp {
     static class Bogie {
         String name;
         int capacity;
-
         Bogie(String name, int capacity) {
             this.name = name;
             this.capacity = capacity;
         }
-
-        @Override
         public String toString() {
             return name + " -> " + capacity;
         }
     }
 
-    private static List<Bogie> filterBogies(List<Bogie> bogies, int threshold) {
-        return bogies.stream()
-                .filter(b -> b.capacity > threshold)
-                .collect(Collectors.toList());
+    private static Map<String, List<Bogie>> groupBogies(List<Bogie> bogies) {
+        return bogies.stream().collect(Collectors.groupingBy(b -> b.name));
     }
 
     public static void main(String[] args) {
-        testFilter_CapacityGreaterThanThreshold();
-        testFilter_CapacityEqualToThreshold();
-        testFilter_CapacityLessThanThreshold();
-        testFilter_MultipleBogiesMatching();
-        testFilter_NoBogiesMatching();
-        testFilter_AllBogiesMatching();
-        testFilter_EmptyBogieList();
-        testFilter_OriginalListUnchanged();
-    }
+        System.out.println("UC9 - Group Bogies by Type\n");
 
-    static void testFilter_CapacityGreaterThanThreshold() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("AC Chair", 56));
-        List<Bogie> result = filterBogies(bogies, 70);
-        System.out.println("GreaterThanThreshold: " + result);
-    }
-
-    static void testFilter_CapacityEqualToThreshold() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Equal", 70), new Bogie("High", 80));
-        List<Bogie> result = filterBogies(bogies, 70);
-        System.out.println("EqualToThreshold: " + result);
-    }
-
-    static void testFilter_CapacityLessThanThreshold() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Low", 60), new Bogie("Lower", 50));
-        List<Bogie> result = filterBogies(bogies, 70);
-        System.out.println("LessThanThreshold: " + result);
-    }
-
-    static void testFilter_MultipleBogiesMatching() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("General", 90), new Bogie("AC Chair", 56));
-        List<Bogie> result = filterBogies(bogies, 60);
-        System.out.println("MultipleMatching: " + result);
-    }
-
-    static void testFilter_NoBogiesMatching() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Small", 20), new Bogie("Medium", 40));
-        List<Bogie> result = filterBogies(bogies, 60);
-        System.out.println("NoMatching: " + result);
-    }
-
-    static void testFilter_AllBogiesMatching() {
-        List<Bogie> bogies = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("General", 90));
-        List<Bogie> result = filterBogies(bogies, 60);
-        System.out.println("AllMatching: " + result);
-    }
-
-    static void testFilter_EmptyBogieList() {
-        List<Bogie> bogies = new ArrayList<>();
-        List<Bogie> result = filterBogies(bogies, 60);
-        System.out.println("EmptyList: " + result);
-    }
-
-    static void testFilter_OriginalListUnchanged() {
         List<Bogie> bogies = new ArrayList<>();
         bogies.add(new Bogie("Sleeper", 72));
         bogies.add(new Bogie("AC Chair", 56));
-        List<Bogie> result = filterBogies(bogies, 60);
-        System.out.println("OriginalListUnchanged: " + bogies + " | Filtered: " + result);
+        bogies.add(new Bogie("First Class", 24));
+        bogies.add(new Bogie("Sleeper", 70));
+        bogies.add(new Bogie("AC Chair", 60));
+
+        System.out.println("All Bogies:");
+        bogies.forEach(System.out::println);
+
+        Map<String, List<Bogie>> groupedBogies = groupBogies(bogies);
+
+        System.out.println("\nGrouped Bogies:");
+        for (Map.Entry<String, List<Bogie>> entry : groupedBogies.entrySet()) {
+            System.out.println("\nBogie Type: " + entry.getKey());
+            for (Bogie b : entry.getValue()) {
+                System.out.println("Capacity -> " + b.capacity);
+            }
+        }
+
+        System.out.println("\nUC9 grouping completed ...");
+
+        System.out.println("\n--- Test Cases ---");
+
+        System.out.println("testGrouping_BogiesGroupedByType: " + groupBogies(Arrays.asList(
+                new Bogie("Sleeper", 72), new Bogie("Sleeper", 70))));
+
+        System.out.println("testGrouping_MultipleBogiesInSameGroup: " + groupBogies(Arrays.asList(
+                new Bogie("AC Chair", 56), new Bogie("AC Chair", 60))));
+
+        System.out.println("testGrouping_DifferentBogieTypes: " + groupBogies(Arrays.asList(
+                new Bogie("Sleeper", 72), new Bogie("First Class", 24))));
+
+        System.out.println("testGrouping_EmptyBogieList: " + groupBogies(new ArrayList<>()));
+
+        System.out.println("testGrouping_SingleBogieCategory: " + groupBogies(Arrays.asList(
+                new Bogie("Sleeper", 72))));
+
+        Map<String, List<Bogie>> keysTest = groupBogies(Arrays.asList(
+                new Bogie("Sleeper", 72), new Bogie("AC Chair", 56), new Bogie("First Class", 24)));
+        System.out.println("testGrouping_MapContainsCorrectKeys: " + keysTest.keySet());
+
+        Map<String, List<Bogie>> sizeTest = groupBogies(Arrays.asList(
+                new Bogie("Sleeper", 72), new Bogie("Sleeper", 70), new Bogie("AC Chair", 56)));
+        System.out.println("testGrouping_GroupSizeValidation: Sleeper=" + sizeTest.get("Sleeper").size()
+                + ", AC Chair=" + sizeTest.get("AC Chair").size());
+
+        List<Bogie> original = new ArrayList<>();
+        original.add(new Bogie("Sleeper", 72));
+        original.add(new Bogie("AC Chair", 56));
+        groupBogies(original);
+        System.out.println("testGrouping_OriginalListUnchanged: " + original.size() + " bogies remain");
     }
 }
