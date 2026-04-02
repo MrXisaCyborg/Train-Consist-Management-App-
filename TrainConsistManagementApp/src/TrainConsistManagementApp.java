@@ -15,64 +15,51 @@ public class TrainConsistManagementApp {
         }
     }
 
-    private static Map<String, List<Bogie>> groupBogies(List<Bogie> bogies) {
-        return bogies.stream().collect(Collectors.groupingBy(b -> b.name));
+    private static int countTotalSeats(List<Bogie> bogies) {
+        return bogies.stream().map(b -> b.capacity).reduce(0, Integer::sum);
     }
 
     public static void main(String[] args) {
-        System.out.println("UC9 - Group Bogies by Type\n");
+        System.out.println("UC10 - Count Total Seats in Train\n");
 
         List<Bogie> bogies = new ArrayList<>();
         bogies.add(new Bogie("Sleeper", 72));
         bogies.add(new Bogie("AC Chair", 56));
         bogies.add(new Bogie("First Class", 24));
         bogies.add(new Bogie("Sleeper", 70));
-        bogies.add(new Bogie("AC Chair", 60));
 
-        System.out.println("All Bogies:");
+        System.out.println("Bogies in Train:");
         bogies.forEach(System.out::println);
 
-        Map<String, List<Bogie>> groupedBogies = groupBogies(bogies);
+        int totalSeats = countTotalSeats(bogies);
+        System.out.println("\nTotal Seating Capacity of Train: " + totalSeats);
 
-        System.out.println("\nGrouped Bogies:");
-        for (Map.Entry<String, List<Bogie>> entry : groupedBogies.entrySet()) {
-            System.out.println("\nBogie Type: " + entry.getKey());
-            for (Bogie b : entry.getValue()) {
-                System.out.println("Capacity -> " + b.capacity);
-            }
-        }
-
-        System.out.println("\nUC9 grouping completed ...");
+        System.out.println("\nUC10 aggregation completed ...");
 
         System.out.println("\n--- Test Cases ---");
 
-        System.out.println("testGrouping_BogiesGroupedByType: " + groupBogies(Arrays.asList(
-                new Bogie("Sleeper", 72), new Bogie("Sleeper", 70))));
+        List<Bogie> test1 = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("AC Chair", 56));
+        System.out.println("testReduce_TotalSeatCalculation: " + countTotalSeats(test1));
 
-        System.out.println("testGrouping_MultipleBogiesInSameGroup: " + groupBogies(Arrays.asList(
-                new Bogie("AC Chair", 56), new Bogie("AC Chair", 60))));
+        List<Bogie> test2 = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("AC Chair", 56), new Bogie("First Class", 24));
+        System.out.println("testReduce_MultipleBogiesAggregation: " + countTotalSeats(test2));
 
-        System.out.println("testGrouping_DifferentBogieTypes: " + groupBogies(Arrays.asList(
-                new Bogie("Sleeper", 72), new Bogie("First Class", 24))));
+        List<Bogie> test3 = Arrays.asList(new Bogie("Sleeper", 72));
+        System.out.println("testReduce_SingleBogieCapacity: " + countTotalSeats(test3));
 
-        System.out.println("testGrouping_EmptyBogieList: " + groupBogies(new ArrayList<>()));
+        List<Bogie> test4 = new ArrayList<>();
+        System.out.println("testReduce_EmptyBogieList: " + countTotalSeats(test4));
 
-        System.out.println("testGrouping_SingleBogieCategory: " + groupBogies(Arrays.asList(
-                new Bogie("Sleeper", 72))));
+        List<Bogie> test5 = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("AC Chair", 56));
+        System.out.println("testReduce_CorrectCapacityExtraction: " + test5.stream().map(b -> b.capacity).collect(Collectors.toList()));
 
-        Map<String, List<Bogie>> keysTest = groupBogies(Arrays.asList(
-                new Bogie("Sleeper", 72), new Bogie("AC Chair", 56), new Bogie("First Class", 24)));
-        System.out.println("testGrouping_MapContainsCorrectKeys: " + keysTest.keySet());
+        List<Bogie> test6 = Arrays.asList(new Bogie("Sleeper", 72), new Bogie("AC Chair", 56), new Bogie("First Class", 24));
+        System.out.println("testReduce_AllBogiesIncluded: " + countTotalSeats(test6));
 
-        Map<String, List<Bogie>> sizeTest = groupBogies(Arrays.asList(
-                new Bogie("Sleeper", 72), new Bogie("Sleeper", 70), new Bogie("AC Chair", 56)));
-        System.out.println("testGrouping_GroupSizeValidation: Sleeper=" + sizeTest.get("Sleeper").size()
-                + ", AC Chair=" + sizeTest.get("AC Chair").size());
-
-        List<Bogie> original = new ArrayList<>();
-        original.add(new Bogie("Sleeper", 72));
-        original.add(new Bogie("AC Chair", 56));
-        groupBogies(original);
-        System.out.println("testGrouping_OriginalListUnchanged: " + original.size() + " bogies remain");
+        List<Bogie> test7 = new ArrayList<>();
+        test7.add(new Bogie("Sleeper", 72));
+        test7.add(new Bogie("AC Chair", 56));
+        countTotalSeats(test7);
+        System.out.println("testReduce_OriginalListUnchanged: " + test7.size() + " bogies remain");
     }
 }
